@@ -1,0 +1,3 @@
+CPU 0 is empty
+CPU 1 is empty
+cpus=2

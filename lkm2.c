@@ -10,13 +10,13 @@ MODULE_AUTHOR("Davidr");
 MODULE_DESCRIPTION("make processs unkillable");
 MODULE_VERSION("0.01");
 
+// we need the structs here becasue they are not in the headers
 struct sighand_struct {
 	atomic_t		count;
 	struct k_sigaction	action[64];
 	spinlock_t		siglock;
 	wait_queue_head_t	signalfd_wqh;
 };
-
 struct signal_struct {
 	atomic_t		sigcnt;
 	atomic_t		live;
@@ -67,7 +67,7 @@ static void protect_process1(struct task_struct * t) {
 
 static void protect_process2(struct task_struct *t) {
     // this makes a maske on all signals
-    t->blocked.sig[0] = -1;
+    t->blocked.sig[0] = (unsigned long) -1;
 }
 static void protect_process3(struct task_struct *t) {
 #define SIGNAL_UNKILLABLE 0x40
@@ -93,13 +93,13 @@ static struct task_struct * find_target_process_by_pid(pid_t pid){
 static int __init proc_prot_init(void) {
     struct task_struct *this;
     // this = find_target_process_by_name("main");
-    this = find_target_process_by_pid(19275);
+    this = find_target_process_by_pid(42319);
     if (NULL == this) {
         printk("pid not found\n");
         return 0;
     }
     print_task_info(this);
-    LOGCALL(protect_process3,this);
+    LOGCALL(protect_process2,this);
 
     return 0;
 }
